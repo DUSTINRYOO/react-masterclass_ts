@@ -4,6 +4,8 @@ import Root from "./Root";
 import About from "./Screen/About";
 import Home from "./Screen/Home";
 import NotFound from "./Screen/NotFound";
+import Coin from "./Screen/routes/Coin";
+import Coins from "./Screen/routes/Coins";
 import Followers from "./Screen/users/Followers";
 import User from "./Screen/users/User";
 
@@ -22,11 +24,19 @@ const router = createBrowserRouter([
         element: <About />,
       },
       {
+        path: "coins",
+        element: <Coins />,
+      },
+      {
+        path: "coins/:coinId",
+        element: <Coin />,
+      },
+      {
         path: "users/:userId",
         element: <User />,
         children: [
           {
-            path: "follow",
+            path: "btc",
             element: <Followers />,
           },
         ],
