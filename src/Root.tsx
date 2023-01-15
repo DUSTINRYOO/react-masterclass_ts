@@ -47,6 +47,18 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	background-color: ${(props) => props.theme.bgColor};
+	color: ${(props) => props.theme.textColor};
+}
+a {
+	text-decoration: none;
+	color: inherit;
+}
+* {
+	box-sizing: border-box;
+}
 `;
 
 function Root() {

@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import ErrorComp from "./components/ErrorComponent";
 import Root from "./Root";
-import About from "./Screen/About";
 import Home from "./Screen/Home";
 import NotFound from "./Screen/NotFound";
 import Coin from "./Screen/routes/Coin";
@@ -19,10 +18,7 @@ const router = createBrowserRouter([
         element: <Home />,
         errorElement: <ErrorComp />,
       },
-      {
-        path: "about",
-        element: <About />,
-      },
+
       {
         path: "coins",
         element: <Coins />,
@@ -36,7 +32,7 @@ const router = createBrowserRouter([
         element: <User />,
         children: [
           {
-            path: "btc",
+            path: "follow",
             element: <Followers />,
           },
         ],

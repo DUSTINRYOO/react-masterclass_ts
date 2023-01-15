@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 function Header() {
   const navigate = useNavigate();
   const onClick = () => {
-    navigate("/about");
+    navigate("/Coins");
   };
   return (
     <header>
@@ -12,7 +12,7 @@ function Header() {
           <Link to="/">Home</Link>
         </li>
         <li>
-          <button onClick={onClick}>About</button>
+          <button onClick={onClick}>Coins</button>
         </li>
       </ul>
     </header>
