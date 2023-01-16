@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useMatch,
+  useParams,
+} from "react-router-dom";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -50,6 +56,29 @@ const OverviewItem = styled.div`
 const Description = styled.p`
   margin: 20px 0px;
 `;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 10px;
+  width: 100%;
+`;
+
+const Tab = styled.span<{ isActive: boolean }>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 14px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
+  border-radius: 10px;
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  a {
+    display: block;
+  }
+`;
+
 interface InfoData {
   id: string;
   name: string;
@@ -109,6 +138,8 @@ function Coin() {
   const { state } = useLocation();
   const [info, setInfo] = useState<InfoData>();
   const [price, setPrice] = useState<PriceData>();
+  const priceMatch = useMatch("/coins/:coinId/price");
+  const chartMatch = useMatch("/coins/:coinId/chart");
   useEffect(() => {
     (async () => {
       const infoData = await (
@@ -121,16 +152,14 @@ function Coin() {
       setPrice(priceData);
       setLoading(false);
     })();
-  }, []);
+  }, [coinId]);
   return (
     <Container>
       <Header>
-        <Title>{state?.name || "Loading..."}</Title>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : info?.name}
         </Title>
       </Header>
-      {loading ? <Loader>Loading...</Loader> : null}
       {loading ? (
         <Loader>Loading...</Loader>
       ) : (
@@ -160,6 +189,16 @@ function Coin() {
               <span>{price?.max_supply}</span>
             </OverviewItem>
           </Overview>
+          <Tabs>
+            <Tab isActive={chartMatch !== null}>
+              <Link to={`/coins/${coinId}/chart`}>Chart</Link>
+            </Tab>
+            <Tab isActive={priceMatch !== null}>
+              <Link to={`/coins/${coinId}/price`}>Price</Link>
+            </Tab>
+          </Tabs>
+
+          <Outlet></Outlet>
         </>
       )}
     </Container>
