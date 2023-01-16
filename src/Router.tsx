@@ -7,8 +7,6 @@ import Chart from "./Screen/routes/Chart";
 import Coin from "./Screen/routes/Coin";
 import Coins from "./Screen/routes/Coins";
 import Price from "./Screen/routes/Price";
-import Followers from "./Screen/users/Followers";
-import User from "./Screen/users/User";
 
 const router = createBrowserRouter([
   {
@@ -36,16 +34,6 @@ const router = createBrowserRouter([
           {
             path: "price",
             element: <Price />,
-          },
-        ],
-      },
-      {
-        path: "users/:userId",
-        element: <User />,
-        children: [
-          {
-            path: "follow",
-            element: <Followers />,
           },
         ],
       },

@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Link,
   Outlet,
   useLocation,
   useMatch,
+  useOutletContext,
   useParams,
 } from "react-router-dom";
 import styled from "styled-components";
+import { fetchCoinInfo, fetchCoinTickers } from "../../api";
+import { Helmet } from "react-helmet";
 
 const Container = styled.div`
   padding: 0px 10px;
@@ -21,13 +24,13 @@ const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 30px;
 `;
-
-const Title = styled.h1`
-  color: ${(props) => props.theme.accentColor};
-  font-size: 30px;
-  font-weight: 800;
-  margin-bottom: 40px;
+const Title = styled.span`
+  font-size: 50px;
+  font-weight: 600;
+  margin: 30px;
+  text-shadow: 3px 3px 10px;
 `;
 
 const Loader = styled.span`
@@ -132,32 +135,36 @@ interface PriceData {
     };
   };
 }
+
+type ContextType = { coinId: string | undefined };
+
 function Coin() {
   const { coinId } = useParams();
-  const [loading, setLoading] = useState(true);
   const { state } = useLocation();
-  const [info, setInfo] = useState<InfoData>();
-  const [price, setPrice] = useState<PriceData>();
   const priceMatch = useMatch("/coins/:coinId/price");
   const chartMatch = useMatch("/coins/:coinId/chart");
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setInfo(infoData);
-      setPrice(priceData);
-      setLoading(false);
-    })();
-  }, [coinId]);
+  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
+    ["info", coinId],
+    () => fetchCoinInfo(coinId)
+  );
+  const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
+    ["tickers", coinId],
+    () => fetchCoinTickers(coinId),
+    {
+      refetchInterval: 10000,
+    }
+  );
+  const loading = infoLoading || tickersLoading;
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </title>
+      </Helmet>
       <Header>
         <Title>
-          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
       </Header>
       {loading ? (
@@ -167,26 +174,26 @@ function Coin() {
           <Overview>
             <OverviewItem>
               <span>Rank:</span>
-              <span>{info?.rank}</span>
+              <span>{infoData?.rank}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Symbol:</span>
-              <span>${info?.symbol}</span>
+              <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{info?.open_source ? "Yes" : "No"}</span>
+              <span>Price:</span>
+              <span>${tickersData?.quotes.USD.price.toFixed(1)}</span>
             </OverviewItem>
           </Overview>
-          <Description>{info?.description}</Description>
+          <Description>{infoData?.description}</Description>
           <Overview>
             <OverviewItem>
               <span>Total Suply:</span>
-              <span>{price?.total_supply}</span>
+              <span>{tickersData?.total_supply}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Max Supply:</span>
-              <span>{price?.max_supply}</span>
+              <span>{tickersData?.max_supply}</span>
             </OverviewItem>
           </Overview>
           <Tabs>
@@ -198,10 +205,14 @@ function Coin() {
             </Tab>
           </Tabs>
 
-          <Outlet></Outlet>
+          <Outlet context={{ coinId }}></Outlet>
         </>
       )}
     </Container>
   );
 }
 export default Coin;
+
+export function useCoinId() {
+  return useOutletContext<ContextType>();
+}
