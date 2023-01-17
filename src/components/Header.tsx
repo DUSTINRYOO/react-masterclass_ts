@@ -3,11 +3,12 @@ import styled from "styled-components";
 
 const HeaderBox = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
   border-bottom: 2px solid gray;
+  padding-bottom: 10px;
 `;
 
 const HomeBtn = styled.span`
@@ -24,6 +25,9 @@ const HomeBtn = styled.span`
   color: ${(props) => props.theme.bgColor};
 `;
 
+const Box = styled.div`
+  display: flex;
+`;
 const CoinBtn = styled.button`
   display: block;
   font-size: 30px;
@@ -37,18 +41,24 @@ const CoinBtn = styled.button`
   background-color: ${(props) => props.theme.textColor};
   color: ${(props) => props.theme.bgColor};
 `;
+interface IToggleDark {
+  toggleDark: () => void;
+}
 
-function Header() {
+function Header({ toggleDark }: IToggleDark) {
   const navigate = useNavigate();
   const onClick = () => {
     navigate("/Coins");
   };
   return (
     <HeaderBox>
-      <Link to="/">
-        <HomeBtn>Home</HomeBtn>
-      </Link>
-      <CoinBtn onClick={onClick}>Coins</CoinBtn>
+      <Box>
+        <Link to="/">
+          <HomeBtn>Home</HomeBtn>
+        </Link>
+        <CoinBtn onClick={onClick}>Coins</CoinBtn>
+      </Box>
+      <button onClick={toggleDark}>Toggle Mode</button>
     </HeaderBox>
   );
 }
