@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
+import { isDarkAtom } from "../atoms";
 
 const HeaderBox = styled.div`
   display: flex;
@@ -41,11 +43,18 @@ const CoinBtn = styled.button`
   background-color: ${(props) => props.theme.textColor};
   color: ${(props) => props.theme.bgColor};
 `;
-interface IToggleDark {
-  toggleDark: () => void;
-}
-
-function Header({ toggleDark }: IToggleDark) {
+const Toggle = styled.button`
+  display: flex;
+  color: ${(props) => props.theme.bgColor};
+  background-color: whitesmoke;
+  padding: 5px 15px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 15px;
+`;
+function Header() {
+  const setterFn = useSetRecoilState(isDarkAtom);
+  const toggleMode = () => setterFn((prev) => !prev);
   const navigate = useNavigate();
   const onClick = () => {
     navigate("/Coins");
@@ -58,7 +67,7 @@ function Header({ toggleDark }: IToggleDark) {
         </Link>
         <CoinBtn onClick={onClick}>Coins</CoinBtn>
       </Box>
-      <button onClick={toggleDark}>Toggle Mode</button>
+      <Toggle onClick={toggleMode}>Toggle Mode</Toggle>
     </HeaderBox>
   );
 }

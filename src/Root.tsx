@@ -1,7 +1,9 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
+import { isDarkAtom } from "./atoms";
 import Header from "./components/Header";
 import { lightTheme, darkTheme } from "./theme";
 
@@ -64,13 +66,12 @@ a {
 `;
 
 function Root() {
-  const [isDark, setIsDark] = useState(false);
-  const toggleDark = () => setIsDark((current) => !current);
+  const isDark = useRecoilValue(isDarkAtom);
   return (
     <>
       <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
         <GlobalStyle />
-        <Header toggleDark={toggleDark} />
+        <Header />
         <Outlet />
         <ReactQueryDevtools initialIsOpen={true} />
       </ThemeProvider>
