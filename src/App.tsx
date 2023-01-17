@@ -1,11 +1,5 @@
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
-import { useRecoilValue } from "recoil";
-import { createGlobalStyle, ThemeProvider } from "styled-components";
-import { isDarkAtom } from "./atoms";
-import Header from "./components/Header";
-import { lightTheme, darkTheme } from "./theme";
+import { createGlobalStyle } from "styled-components";
+import ToDoList from "./TodoList";
 
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -65,18 +59,13 @@ a {
 }
 `;
 
-function Root() {
-  const isDark = useRecoilValue(isDarkAtom);
+function App() {
   return (
     <>
-      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
-        <GlobalStyle />
-        <Header />
-        <Outlet />
-        <ReactQueryDevtools initialIsOpen={true} />
-      </ThemeProvider>
+      <GlobalStyle />
+      <ToDoList />
     </>
   );
 }
 
-export default Root;
+export default App;

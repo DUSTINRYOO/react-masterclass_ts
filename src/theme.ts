@@ -5,8 +5,3 @@ export const darkTheme: DefaultTheme = {
   textColor: "#fdcb6e",
   accentColor: "#00b894",
 };
-export const lightTheme: DefaultTheme = {
-  bgColor: "#00b894",
-  textColor: "#fdcb6e",
-  accentColor: "#2d3436",
-};
