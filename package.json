@@ -17,6 +17,7 @@
     "@types/react-query": "^1.2.9",
     "@types/styled-components": "^5.1.26",
     "apexcharts": "^3.36.3",
+    "framer-motion": "^8.5.0",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.0",
     "react-beautiful-dnd": "^13.1.1",
