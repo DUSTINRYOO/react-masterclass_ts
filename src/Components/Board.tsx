@@ -1,21 +1,21 @@
-import React from "react";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "react-beautiful-dnd";
-import { useRecoilValue } from "recoil";
+import { Droppable } from "react-beautiful-dnd";
+
 import styled from "styled-components";
 import DragabbleCard from "./DragabbleCard";
 
-const BoardComp = styled.div`
+interface IAreaProps {
+  isDraggingOver: boolean;
+  isDraggingFromThis?: boolean;
+}
+
+const BoardComp = styled.div<IAreaProps>`
   padding: 20px 10px;
   padding-top: 30px;
   border-radius: 10px;
   min-height: 200px;
   margin: 0px 5px;
-  background-color: ${(props) => props.theme.boardColor};
+  background-color: ${(props) =>
+    props.isDraggingOver ? "pink" : props.isDraggingFromThis ? "red" : "blue"};
 `;
 
 interface IBoardProps {
@@ -25,8 +25,13 @@ interface IBoardProps {
 function Board({ toDos, boardId }: IBoardProps) {
   return (
     <Droppable droppableId={boardId}>
-      {(provided) => (
-        <BoardComp ref={provided.innerRef} {...provided.droppableProps}>
+      {(provided, snapshot) => (
+        <BoardComp
+          isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)}
+          isDraggingOver={snapshot.isDraggingOver}
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+        >
           {toDos.map((toDo, index) => (
             <DragabbleCard key={toDo} index={index} toDo={toDo} />
           ))}

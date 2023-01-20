@@ -1,13 +1,8 @@
 import styled from "styled-components";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "react-beautiful-dnd";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
 import { toDoState } from "./atoms";
-import DraggabbleCard from "./Components/DragabbleCard";
+
 import Board from "./Components/Board";
 
 const Wrapper = styled.div`
@@ -20,7 +15,10 @@ const Wrapper = styled.div`
   height: 100vh;
 `;
 const Boards = styled.div`
+  background-color: #d9d9d9;
   display: grid;
+  padding: 10px 5px;
+  border-radius: 10px;
   width: 100%;
   grid-template-columns: repeat(3, 1fr);
 `;
