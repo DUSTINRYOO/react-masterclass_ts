@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { motion } from "framer-motion";
-import { useRef } from "react";
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 const Wrapper = styled.div`
   height: 100vh;
@@ -76,6 +76,7 @@ const BiggerBox = styled(motion.div)`
   background-color: #e6e6e6;
   border-radius: 40px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   overflow: hidden;
@@ -111,8 +112,15 @@ const myVar3 = {
   hover: { scale: 1.2, rotateZ: 90 },
   click: { scale: 1, borderRadius: "100px" },
 };
+
 function App() {
+  const x = useMotionValue(0);
+  const scale = useTransform(x, [-200, 0, 200], [2, 1, 0]);
+  /*   useEffect(() => {
+    x.onChange(() => console.log(x));
+  }, [x]); */
   const biggerBoxRef = useRef<HTMLDivElement>(null);
+
   return (
     <Wrapper>
       <Box variants={myVars} initial="start" animate="end">
@@ -125,10 +133,12 @@ function App() {
         <Circle variants={myVar2_Circle}>D</Circle>
       </Box2>
       <BiggerBox ref={biggerBoxRef}>
+        <button onClick={() => x.set(100)}>Click</button>
         <Box3
+          style={{ x, scale }}
           drag
           dragSnapToOrigin
-          dragElastic={0}
+          dragElastic={0.5}
           dragConstraints={biggerBoxRef}
           variants={myVar3}
           whileHover="hover"
