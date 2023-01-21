@@ -1,15 +1,17 @@
 import styled from "styled-components";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, useScroll } from "framer-motion";
 import { useEffect, useRef } from "react";
 
-const Wrapper = styled.div`
-  height: 100vh;
+const Wrapper = styled(motion.div)`
+  height: 200vh;
   width: 100vw;
   display: flex;
   justify-content: center;
-  align-items: center;
+  padding-top: 300px;
+  align-items: flex-start;
+  background-color: linear-gradient
+    (135deg, rgb(238, 0, 153), rgb(255, 171, 225));
 `;
-
 const Box = styled(motion.div)`
   width: 200px;
   height: 200px;
@@ -57,8 +59,8 @@ const Circle = styled(motion.div)`
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 const Box3 = styled(motion.div)`
-  width: 200px;
-  height: 200px;
+  width: 120px;
+  height: 120px;
   background-color: white;
   border-radius: 10px;
   margin: 50px;
@@ -109,21 +111,38 @@ const myVar2_Circle = {
   },
 };
 const myVar3 = {
-  hover: { scale: 1.2, rotateZ: 90 },
+  hover: { scale: 1.2, rotateZ: 360 },
   click: { scale: 1, borderRadius: "100px" },
 };
 
 function App() {
   const x = useMotionValue(0);
-  const scale = useTransform(x, [-200, 0, 200], [2, 1, 0]);
   /*   useEffect(() => {
     x.onChange(() => console.log(x));
   }, [x]); */
+
+  const rotateZ = useTransform(x, [-200, 0, 200], [-360, 0, 360]);
+  const gradient = useTransform(
+    x,
+    [-200, 0, 200],
+    [
+      "linear-gradient(90deg, rgb(255, 255, 255), rgb(0, 13, 255))",
+      "linear-gradient(0deg, rgb(255, 255, 255), rgb(229, 255, 0))",
+      "linear-gradient(-90deg, rgb(255, 255, 255), rgb(255, 0, 0))",
+    ]
+  );
+  const { scrollYProgress } = useScroll();
+  const translateX = useTransform(scrollYProgress, [0, 1], [0, -720]);
   const biggerBoxRef = useRef<HTMLDivElement>(null);
 
   return (
-    <Wrapper>
-      <Box variants={myVars} initial="start" animate="end">
+    <Wrapper style={{ background: gradient }}>
+      <Box
+        style={{ translateX }}
+        variants={myVars}
+        initial="start"
+        animate="end"
+      >
         Box
       </Box>
       <Box2 variants={myVars2} initial="start" animate="end">
@@ -135,17 +154,17 @@ function App() {
       <BiggerBox ref={biggerBoxRef}>
         <button onClick={() => x.set(100)}>Click</button>
         <Box3
-          style={{ x, scale }}
+          style={{ x, rotateZ }}
           drag
           dragSnapToOrigin
           dragElastic={0.5}
           dragConstraints={biggerBoxRef}
           variants={myVar3}
           whileHover="hover"
-          whileDrag={{ backgroundColor: "rgb(46,204,113)" }}
+          whileDrag={{ backgroundColor: "#000000", color: "white" }}
           whileTap="click"
         >
-          Box
+          Drag
         </Box3>
       </BiggerBox>
     </Wrapper>
