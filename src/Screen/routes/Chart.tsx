@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchCoinHistory } from "../../api";
 import { useCoinId } from "./Coin";
 import ReactApexChart from "react-apexcharts";
+import React from "react";
 
 interface IHistoricalData {
   time_open: number;
@@ -20,35 +21,51 @@ function Chart() {
     ["ohlcv", coinId],
     () => fetchCoinHistory(coinId)
   );
+
+  const coinChart = data?.map((coin) => ({
+    x: new Date(coin.time_open),
+    y: [
+      parseFloat(coin.open),
+      parseFloat(coin.high),
+      parseFloat(coin.low),
+      parseFloat(coin.close),
+    ],
+  }));
+  console.log(coinChart);
+
   return (
     <div>
       {isLoading ? (
         "Loading"
       ) : (
         <ReactApexChart
-          type="line"
+          type="candlestick"
           height={300}
           width={500}
           series={[
             {
-              name: "sales",
-              data: data?.map((price) => parseFloat(price.close)) as number[],
+              data: coinChart!,
             },
           ]}
           options={{
-            colors: ["#00b894"],
             theme: {
               mode: "dark",
             },
-            stroke: {
-              curve: "smooth",
-              width: 3,
-            },
             chart: {
-              toolbar: {
-                show: false,
+              type: "candlestick",
+              height: 350,
+            },
+            title: {
+              text: "CandleStick Chart",
+              align: "left",
+            },
+            xaxis: {
+              type: "datetime",
+            },
+            yaxis: {
+              tooltip: {
+                enabled: true,
               },
-              background: "#2d3436",
             },
           }}
         />
