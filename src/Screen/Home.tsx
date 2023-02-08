@@ -26,7 +26,7 @@ function Home() {
       <Helmet>
         <title>Home</title>
       </Helmet>
-      <Title>Dustin's Chart</Title>
+      <Title>Coin Chart</Title>
       <Img src="https://images.unsplash.com/photo-1622630998477-20aa696ecb05?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3346&q=80" />
     </Main>
   );
