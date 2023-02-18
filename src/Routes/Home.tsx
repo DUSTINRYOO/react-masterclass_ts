@@ -1,7 +1,15 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { motion, AnimatePresence, useScroll } from "framer-motion";
-import { getMovies, IGetMoviesResult } from "../api";
+import {
+  getLatest,
+  getMovies,
+  getTopRated,
+  getUpComing,
+  IGetLatestResult,
+  IGetMoviesResult,
+  IGetTopRatedResult,
+} from "../api";
 import { makeImagePath } from "../utils";
 import { useState } from "react";
 import { useNavigate, useMatch, PathMatch } from "react-router-dom";
@@ -41,10 +49,22 @@ const Overview = styled.p`
 
 const Slider = styled.div`
   position: relative;
-  top: -100px;
+  top: -150px;
 `;
 
 const Row = styled(motion.div)`
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(6, 1fr);
+  position: absolute;
+  width: 100%;
+`;
+const LatestSlider = styled.div`
+  position: relative;
+  top: 100px;
+`;
+
+const LatestRow = styled(motion.div)`
   display: grid;
   gap: 5px;
   grid-template-columns: repeat(6, 1fr);
@@ -168,10 +188,18 @@ function Home() {
   const history = useNavigate();
   const bigMovieMatch: PathMatch<string> | null = useMatch("/movies/:movieId");
   const { scrollY } = useScroll();
+  const { data: latestData, isLoading: loadingLatest } =
+    useQuery<IGetLatestResult>(["latest"], getLatest);
+  console.log(latestData);
+  const { data: topRatedData, isLoading: loadingTopRated } =
+    useQuery<IGetTopRatedResult>(["movies", "nowPlaying"], getTopRated);
+  const { data: upCommingData, isLoading: loadingUpComming } =
+    useQuery<IGetMoviesResult>(["movies", "nowPlaying"], getUpComing);
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getMovies
   );
+  console.log(data);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const increaseIndex = () => {
@@ -238,6 +266,16 @@ function Home() {
               </Row>
             </AnimatePresence>
           </Slider>
+          <LatestSlider>
+            <LatestRow>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div>Heloo</div>
+            </LatestRow>
+          </LatestSlider>
           <AnimatePresence>
             {bigMovieMatch ? (
               <>
