@@ -29,6 +29,7 @@ export interface IGetLatestResult {
   release_data: string;
   title: string;
   overview: string;
+  adult: boolean;
 }
 
 export interface IGetTopRatedResult {

@@ -36,6 +36,33 @@ const Banner = styled.div<{ bgPhoto: string }>`
     url(${(props) => props.bgPhoto});
   background-size: cover;
 `;
+const Btn = styled.div`
+  opacity: 0.6;
+  font-size: 36px;
+  text-align: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  position: absolute;
+  cursor: pointer;
+  &:first-child {
+    top: 80px;
+    left: 10px;
+  }
+  &:nth-child(2) {
+    top: 80px;
+    right: 10px;
+  }
+  z-index: 1;
+  &:hover {
+    opacity: 1;
+    transition: all 0.3s ease-in-out;
+  }
+  &:active {
+    scale: 1.4;
+    transition: all 0.3s ease-in-out;
+  }
+`;
 
 const Title = styled.h2`
   font-size: 68px;
@@ -61,15 +88,11 @@ const Row = styled(motion.div)`
 `;
 const LatestSlider = styled.div`
   position: relative;
-  top: 100px;
+  top: -400px;
 `;
-
-const LatestRow = styled(motion.div)`
-  display: grid;
-  gap: 5px;
-  grid-template-columns: repeat(6, 1fr);
-  position: absolute;
-  width: 100%;
+const TopRatedSlider = styled.div`
+  position: relative;
+  top: 100px;
 `;
 
 const Box = styled(motion.div)<{ bgPhoto: string }>`
@@ -145,15 +168,15 @@ const BigOverview = styled.p`
 `;
 
 const rowVariants = {
-  hidden: {
-    x: window.outerWidth + 5,
-  },
+  hidden: (direction: boolean) => ({
+    x: direction ? window.outerWidth : -window.outerWidth,
+  }),
   visible: {
     x: 0,
   },
-  exit: {
-    x: -window.outerWidth - 5,
-  },
+  exit: (direction: boolean) => ({
+    x: direction ? -window.outerWidth : window.outerWidth,
+  }),
 };
 
 const boxVariants = {
@@ -164,7 +187,7 @@ const boxVariants = {
     scale: 1.3,
     y: -80,
     transition: {
-      delay: 0.5,
+      delay: 0.2,
       duaration: 0.1,
       type: "tween",
     },
@@ -175,7 +198,7 @@ const infoVariants = {
   hover: {
     opacity: 1,
     transition: {
-      delay: 0.5,
+      delay: 0.2,
       duaration: 0.1,
       type: "tween",
     },
@@ -190,25 +213,58 @@ function Home() {
   const { scrollY } = useScroll();
   const { data: latestData, isLoading: loadingLatest } =
     useQuery<IGetLatestResult>(["latest"], getLatest);
-  console.log(latestData);
+
   const { data: topRatedData, isLoading: loadingTopRated } =
-    useQuery<IGetTopRatedResult>(["movies", "nowPlaying"], getTopRated);
+    useQuery<IGetTopRatedResult>(["movies", "topRated"], getTopRated);
   const { data: upCommingData, isLoading: loadingUpComming } =
     useQuery<IGetMoviesResult>(["movies", "nowPlaying"], getUpComing);
   const { data, isLoading } = useQuery<IGetMoviesResult>(
     ["movies", "nowPlaying"],
     getMovies
   );
-  console.log(data);
+  console.log(latestData);
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(false);
+  const [topRatedIndex, setTopRatedIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
-  const increaseIndex = () => {
+  const increaseIndex = async () => {
     if (data) {
       if (leaving) return;
+      await setDirection(true);
       toggleLeaving();
       const totalMovies = data.results.length - 1;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+    }
+  };
+  const decreaseIndex = async () => {
+    if (data) {
+      if (leaving) return;
+      await setDirection(false);
+      toggleLeaving();
+      const totalMovies = data.results.length - 1;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
+    }
+  };
+  const increaseTopIndex = async () => {
+    if (topRatedData) {
+      if (leaving) return;
+      await setDirection(true);
+      toggleLeaving();
+      const totalMovies = topRatedData.results.length - 1;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setTopRatedIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+    }
+  };
+  const decreaseTopIndex = async () => {
+    if (topRatedData) {
+      if (leaving) return;
+      await setDirection(false);
+      toggleLeaving();
+      const totalMovies = topRatedData.results.length - 1;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setTopRatedIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
     }
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
@@ -227,16 +283,20 @@ function Home() {
         <Loader>Loading...</Loader>
       ) : (
         <>
-          <Banner
-            onClick={increaseIndex}
-            bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}
-          >
+          <Banner bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}>
             <Title>{data?.results[0].title}</Title>
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
           <Slider>
-            <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+            <AnimatePresence
+              initial={false}
+              onExitComplete={toggleLeaving}
+              custom={direction}
+            >
+              <Btn onClick={decreaseIndex}>⬅️</Btn>
+              <Btn onClick={increaseIndex}>➡️</Btn>
               <Row
+                custom={direction}
                 variants={rowVariants}
                 initial="hidden"
                 animate="visible"
@@ -267,15 +327,69 @@ function Home() {
             </AnimatePresence>
           </Slider>
           <LatestSlider>
-            <LatestRow>
+            <Row>
               <div></div>
               <div></div>
               <div></div>
               <div></div>
               <div></div>
-              <div>Heloo</div>
-            </LatestRow>
+              {latestData && latestData.adult === false ? (
+                <Box
+                  whileHover="hover"
+                  initial="normal"
+                  variants={boxVariants}
+                  transition={{ type: "tween" }}
+                  bgPhoto={makeImagePath(latestData.poster_path!, "w500")}
+                >
+                  <Info variants={infoVariants}>
+                    <h4>{latestData?.title}</h4>
+                  </Info>
+                </Box>
+              ) : null}
+            </Row>
           </LatestSlider>
+          <TopRatedSlider>
+            <AnimatePresence
+              initial={false}
+              onExitComplete={toggleLeaving}
+              custom={direction}
+            >
+              <Btn onClick={decreaseTopIndex}>⬅️</Btn>
+              <Btn onClick={increaseTopIndex}>➡️</Btn>
+              <Row
+                custom={direction}
+                variants={rowVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{ type: "tween", duration: 1 }}
+                key={topRatedIndex}
+              >
+                {topRatedData?.results
+                  .slice(1)
+                  .slice(
+                    offset * topRatedIndex,
+                    offset * topRatedIndex + offset
+                  )
+                  .map((topMoive) => (
+                    <Box
+                      layoutId={topMoive.id + "top"}
+                      key={topMoive.id}
+                      whileHover="hover"
+                      initial="normal"
+                      variants={boxVariants}
+                      onClick={() => onBoxClicked(topMoive.id)}
+                      transition={{ type: "tween" }}
+                      bgPhoto={makeImagePath(topMoive.backdrop_path, "w500")}
+                    >
+                      <Info variants={infoVariants}>
+                        <h4>{topMoive.title}</h4>
+                      </Info>
+                    </Box>
+                  ))}
+              </Row>
+            </AnimatePresence>
+          </TopRatedSlider>
           <AnimatePresence>
             {bigMovieMatch ? (
               <>
