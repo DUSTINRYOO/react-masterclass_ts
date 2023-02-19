@@ -7,6 +7,7 @@ interface IMovie {
   poster_path: string;
   title: string;
   overview: string;
+  release_date: string;
 }
 interface ILatest {
   id: number;
@@ -26,7 +27,8 @@ export interface IGetMoviesResult {
 export interface IGetLatestResult {
   genres: ILatest[];
   poster_path: string;
-  release_data: string;
+  backdrop_path: string;
+  id: number;
   title: string;
   overview: string;
   adult: boolean;
