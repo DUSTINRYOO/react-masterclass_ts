@@ -416,9 +416,7 @@ function Home() {
                       </Info>
                     </LatestBox>
                   </>
-                ) : (
-                  <h1>Latest</h1>
-                )}
+                ) : null}
               </LatestRow>
             </AnimatePresence>
           </LatestSlider>

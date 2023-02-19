@@ -105,3 +105,9 @@ export function getUpComing() {
     (response) => response.json()
   );
 }
+
+export function getSearchTv(keyword: string) {
+  return fetch(
+    `${BASE_PATH}/search/tv?api_key=${API_KEY}&query=${keyword}`
+  ).then((response) => response.json());
+}

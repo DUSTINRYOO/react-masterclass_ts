@@ -5,10 +5,16 @@ import {
   getLatest,
   getMovies,
   getTopRated,
+  getTvAiring,
+  getTvLatest,
+  getTvPopular,
+  getTvTopRated,
   getUpComing,
   IGetLatestResult,
+  IGetLatestTvResult,
   IGetMoviesResult,
   IGetTopRatedResult,
+  IGetTvsResult,
 } from "../api";
 import { makeImagePath } from "../utils";
 import { useState } from "react";
@@ -109,7 +115,7 @@ const TopRatedSlider = styled.div`
   position: relative;
   top: 180px;
 `;
-const UpComingSlider = styled.div`
+const PopularSlider = styled.div`
   position: relative;
   top: 460px;
 `;
@@ -242,22 +248,22 @@ const offset = 6;
 
 function Tv() {
   const history = useNavigate();
-  const bigMovieMatch: PathMatch<string> | null = useMatch("/movies/:movieId");
+  const bigTvMatch: PathMatch<string> | null = useMatch("/tv/:tvId");
   const { scrollY } = useScroll();
-  const { data: latestData, isLoading: loadingLatest } =
-    useQuery<IGetLatestResult>(["movies", "latest"], getLatest);
-  const { data: topRatedData, isLoading: loadingTopRated } =
-    useQuery<IGetTopRatedResult>(["movies", "topRated"], getTopRated);
-  const { data: upComingData, isLoading: loadingUpComing } =
-    useQuery<IGetMoviesResult>(["movies", "upComing"], getUpComing);
-  const { data, isLoading } = useQuery<IGetMoviesResult>(
-    ["movies", "nowPlaying"],
-    getMovies
+  const { data: latestTvData, isLoading: loadingTvLatest } =
+    useQuery<IGetLatestTvResult>(["tv", "latest"], getTvLatest);
+  const { data: topRatedTvData, isLoading: loadingTopTvRated } =
+    useQuery<IGetTvsResult>(["tv", "topRated"], getTvTopRated);
+  const { data: popularTvData, isLoading: loadingPopular } =
+    useQuery<IGetTvsResult>(["tv", "popular"], getTvPopular);
+  const { data, isLoading } = useQuery<IGetTvsResult>(
+    ["tv", "airing"],
+    getTvAiring
   );
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(false);
   const [topRatedIndex, setTopRatedIndex] = useState(0);
-  const [upComingIndex, setUpComingIndex] = useState(0);
+  const [popularIndex, setPopularIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const [slider, setSlider] = useState("");
   const increaseIndex = async () => {
@@ -265,8 +271,8 @@ function Tv() {
       if (leaving) return;
       await setDirection(true);
       toggleLeaving();
-      const totalMovies = data.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      const totalTvs = data.results.length - 1;
+      const maxIndex = Math.floor(totalTvs / offset) - 1;
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
@@ -275,73 +281,67 @@ function Tv() {
       if (leaving) return;
       await setDirection(false);
       toggleLeaving();
-      const totalMovies = data.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      const totalTvs = data.results.length - 1;
+      const maxIndex = Math.floor(totalTvs / offset) - 1;
       setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
     }
   };
   const increaseTopIndex = async () => {
-    if (topRatedData) {
+    if (topRatedTvData) {
       if (leaving) return;
       await setDirection(true);
       toggleLeaving();
-      const totalMovies = topRatedData.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      const totalTvs = topRatedTvData.results.length - 1;
+      const maxIndex = Math.floor(totalTvs / offset) - 1;
       setTopRatedIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
   const decreaseTopIndex = async () => {
-    if (topRatedData) {
+    if (topRatedTvData) {
       if (leaving) return;
       await setDirection(false);
       toggleLeaving();
-      const totalMovies = topRatedData.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      const totalTvs = topRatedTvData.results.length - 1;
+      const maxIndex = Math.floor(totalTvs / offset) - 1;
       setTopRatedIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
     }
   };
-  const increaseUpComingIndex = async () => {
-    if (upComingData) {
+  const increasePopularIndex = async () => {
+    if (popularTvData) {
       if (leaving) return;
       await setDirection(true);
       toggleLeaving();
-      const totalMovies = upComingData.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-      setUpComingIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+      const totalTvs = popularTvData.results.length - 1;
+      const maxIndex = Math.floor(totalTvs / offset) - 1;
+      setPopularIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
-  const decreaseUpComingIndex = async () => {
-    if (upComingData) {
+  const decreasePopularIndex = async () => {
+    if (popularTvData) {
       if (leaving) return;
       await setDirection(false);
       toggleLeaving();
-      const totalMovies = upComingData.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-      setUpComingIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
+      const totalTvs = popularTvData.results.length - 1;
+      const maxIndex = Math.floor(totalTvs / offset) - 1;
+      setPopularIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
     }
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
-  const onBoxClicked = (movieId: number, slider: string) => {
-    history(`/movies/${movieId}`);
+  const onBoxClicked = (tvId: number, slider: string) => {
+    history(`/tv/${tvId}`);
     setSlider(slider);
   };
-  const onOverlayClick = () => history("/");
-  const clickedMovie =
-    bigMovieMatch?.params.movieId &&
-    data?.results.find(
-      (movie) => movie.id + "" === bigMovieMatch.params.movieId
-    );
-  const clickedLatestMovie = bigMovieMatch?.params.movieId && latestData;
-  const clickedTopMovie =
-    bigMovieMatch?.params.movieId &&
-    topRatedData?.results.find(
-      (movie) => movie.id + "" === bigMovieMatch.params.movieId
-    );
-  const clickedUpMovie =
-    bigMovieMatch?.params.movieId &&
-    upComingData?.results.find(
-      (movie) => movie.id + "" === bigMovieMatch.params.movieId
-    );
+  const onOverlayClick = () => history("/tv");
+  const clickedTv =
+    bigTvMatch?.params.tvId &&
+    data?.results.find((tv) => tv.id + "" === bigTvMatch.params.tvId);
+  const clickedLatestTv = bigTvMatch?.params.tvId && latestTvData;
+  const clickedTopTv =
+    bigTvMatch?.params.tvId &&
+    topRatedTvData?.results.find((tv) => tv.id + "" === bigTvMatch.params.tvId);
+  const clickedPopularTv =
+    bigTvMatch?.params.tvId &&
+    popularTvData?.results.find((tv) => tv.id + "" === bigTvMatch.params.tvId);
   return (
     <Wrapper>
       {isLoading ? (
@@ -349,7 +349,7 @@ function Tv() {
       ) : (
         <>
           <Banner bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}>
-            <Title>{data?.results[0].title}</Title>
+            <Title>{data?.results[0].name}</Title>
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
           <Slider>
@@ -360,7 +360,7 @@ function Tv() {
             >
               <Btn onClick={decreaseIndex}>⬅️</Btn>
               <Btn onClick={increaseIndex}>➡️</Btn>
-              <Category>Now playing</Category>
+              <Category>Now Airing</Category>
               <Row
                 custom={direction}
                 variants={rowVariants}
@@ -373,19 +373,19 @@ function Tv() {
                 {data?.results
                   .slice(1)
                   .slice(offset * index, offset * index + offset)
-                  .map((movie) => (
+                  .map((tv) => (
                     <Box
-                      layoutId={movie.id + ""}
-                      key={movie.id}
+                      layoutId={tv.id + ""}
+                      key={tv.id}
                       whileHover="hover"
                       initial="normal"
                       variants={boxVariants}
-                      onClick={() => onBoxClicked(movie.id, "")}
+                      onClick={() => onBoxClicked(tv.id, "")}
                       transition={{ type: "tween" }}
-                      bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
+                      bgPhoto={makeImagePath(tv.backdrop_path, "w500")}
                     >
                       <Info variants={infoVariants}>
-                        <h4>{movie.title}</h4>
+                        <h4>{tv.name}</h4>
                       </Info>
                     </Box>
                   ))}
@@ -399,26 +399,27 @@ function Tv() {
               custom={direction}
             >
               <LatestRow>
-                {latestData ? (
+                {latestTvData ? (
                   <>
                     <Category>Latest</Category>
                     <LatestBox
-                      layoutId={latestData.id + "latest"}
+                      layoutId={latestTvData.id + "latest"}
                       whileHover="hover"
                       initial="normal"
                       variants={boxVariants}
-                      onClick={() => onBoxClicked(latestData.id, "latest")}
+                      onClick={() => onBoxClicked(latestTvData.id, "latest")}
                       transition={{ type: "tween" }}
-                      bgPhoto={makeImagePath(latestData.backdrop_path!, "w500")}
+                      bgPhoto={makeImagePath(
+                        latestTvData.backdrop_path!,
+                        "w500"
+                      )}
                     >
                       <Info variants={infoVariants}>
-                        <h4>{latestData?.title}</h4>
+                        <h4>{latestTvData?.name}</h4>
                       </Info>
                     </LatestBox>
                   </>
-                ) : (
-                  <h1>Latest</h1>
-                )}
+                ) : null}
               </LatestRow>
             </AnimatePresence>
           </LatestSlider>
@@ -440,39 +441,39 @@ function Tv() {
                 transition={{ type: "tween", duration: 1 }}
                 key={topRatedIndex}
               >
-                {topRatedData?.results
+                {topRatedTvData?.results
                   .slice(
                     offset * topRatedIndex,
                     offset * topRatedIndex + offset
                   )
-                  .map((topMoive) => (
+                  .map((topTv) => (
                     <Box
-                      layoutId={topMoive.id + "top"}
-                      key={topMoive.id}
+                      layoutId={topTv.id + "top"}
+                      key={topTv.id}
                       whileHover="hover"
                       initial="normal"
                       variants={boxVariants}
-                      onClick={() => onBoxClicked(topMoive.id, "top")}
+                      onClick={() => onBoxClicked(topTv.id, "top")}
                       transition={{ type: "tween" }}
-                      bgPhoto={makeImagePath(topMoive.backdrop_path, "w500")}
+                      bgPhoto={makeImagePath(topTv.backdrop_path, "w500")}
                     >
                       <Info variants={infoVariants}>
-                        <h4>{topMoive.title}</h4>
+                        <h4>{topTv.name}</h4>
                       </Info>
                     </Box>
                   ))}
               </Row>
             </AnimatePresence>
           </TopRatedSlider>
-          <UpComingSlider>
+          <PopularSlider>
             <AnimatePresence
               initial={false}
               onExitComplete={toggleLeaving}
               custom={direction}
             >
-              <Btn onClick={decreaseUpComingIndex}>⬅️</Btn>
-              <Btn onClick={increaseUpComingIndex}>➡️</Btn>
-              <Category>Up Coming</Category>
+              <Btn onClick={decreasePopularIndex}>⬅️</Btn>
+              <Btn onClick={increasePopularIndex}>➡️</Btn>
+              <Category>Popular</Category>
               <Row
                 custom={direction}
                 variants={rowVariants}
@@ -480,121 +481,111 @@ function Tv() {
                 animate="visible"
                 exit="exit"
                 transition={{ type: "tween", duration: 1 }}
-                key={upComingIndex}
+                key={popularIndex}
               >
-                {upComingData?.results
+                {popularTvData?.results
 
-                  .slice(
-                    offset * upComingIndex,
-                    offset * upComingIndex + offset
-                  )
-                  .map((upMovie) => (
+                  .slice(offset * popularIndex, offset * popularIndex + offset)
+                  .map((popularTv) => (
                     <Box
-                      layoutId={upMovie.id + "up"}
-                      key={upMovie.id}
+                      layoutId={popularTv.id + "popular"}
+                      key={popularTv.id}
                       whileHover="hover"
                       initial="normal"
                       variants={boxVariants}
-                      onClick={() => onBoxClicked(upMovie.id, "up")}
+                      onClick={() => onBoxClicked(popularTv.id, "popular")}
                       transition={{ type: "tween" }}
-                      bgPhoto={makeImagePath(upMovie.backdrop_path, "w500")}
+                      bgPhoto={makeImagePath(popularTv.backdrop_path, "w500")}
                     >
                       <Info variants={infoVariants}>
-                        <h4>{upMovie.title}</h4>
+                        <h4>{popularTv.name}</h4>
                       </Info>
                     </Box>
                   ))}
               </Row>
             </AnimatePresence>
-          </UpComingSlider>
+          </PopularSlider>
           <AnimatePresence>
-            {bigMovieMatch ? (
+            {bigTvMatch ? (
               <>
                 <Overlay
                   onClick={onOverlayClick}
                   exit={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 />
-                {clickedLatestMovie &&
+                {clickedLatestTv &&
                   (slider === "latest" ? (
                     <BigMovie
                       style={{ top: scrollY.get() + 100 }}
-                      layoutId={bigMovieMatch.params.movieId + "latest"}
+                      layoutId={bigTvMatch.params.tvId + "latest"}
                     >
                       <BigCover
                         style={{
                           backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                            clickedLatestMovie.backdrop_path,
+                            clickedLatestTv.backdrop_path,
                             "w500"
                           )})`,
                         }}
                       />
-                      <BigTitle>{clickedLatestMovie.title}</BigTitle>
-                      <BigOverview>{clickedLatestMovie.overview}</BigOverview>
+                      <BigTitle>{clickedLatestTv.name}</BigTitle>
+                      <BigOverview>{clickedLatestTv.overview}</BigOverview>
                     </BigMovie>
                   ) : null)}
-                {clickedMovie &&
+                {clickedTv &&
                   (slider === "" ? (
                     <BigMovie
                       style={{ top: scrollY.get() + 100 }}
-                      layoutId={bigMovieMatch.params.movieId}
+                      layoutId={bigTvMatch.params.tvId}
                     >
                       <BigCover
                         style={{
                           backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                            clickedMovie.backdrop_path,
+                            clickedTv.backdrop_path,
                             "w500"
                           )})`,
                         }}
                       />
-                      <BigTitle>{clickedMovie.title}</BigTitle>
+                      <BigTitle>{clickedTv.name}</BigTitle>
 
-                      <BigOverview>{clickedMovie.overview}</BigOverview>
-                      <BigOverview>
-                        Release Data :{clickedMovie.release_date}
-                      </BigOverview>
+                      <BigOverview>{clickedTv.overview}</BigOverview>
                     </BigMovie>
                   ) : null)}
-                {clickedTopMovie &&
+                {clickedTopTv &&
                   (slider === "top" ? (
                     <BigMovie
                       style={{ top: scrollY.get() + 100 }}
-                      layoutId={bigMovieMatch.params.movieId + "top"}
+                      layoutId={bigTvMatch.params.tvId + "top"}
                     >
                       <BigCover
                         style={{
                           backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                            clickedTopMovie.backdrop_path,
+                            clickedTopTv.backdrop_path,
                             "w500"
                           )})`,
                         }}
                       />
-                      <BigTitle>{clickedTopMovie.title}</BigTitle>
-                      <BigOverview>{clickedTopMovie.overview}</BigOverview>
-                      <BigOverview>
-                        Release Data :{clickedTopMovie.release_date}
-                      </BigOverview>
+                      <BigTitle>{clickedTopTv.name}</BigTitle>
+
+                      <BigOverview>{clickedTopTv.overview}</BigOverview>
                     </BigMovie>
                   ) : null)}
-                {clickedUpMovie &&
-                  (slider === "up" ? (
+                {clickedPopularTv &&
+                  (slider === "popular" ? (
                     <BigMovie
                       style={{ top: scrollY.get() + 100 }}
-                      layoutId={bigMovieMatch.params.movieId + "up"}
+                      layoutId={bigTvMatch.params.tvId + "popular"}
                     >
                       <BigCover
                         style={{
                           backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                            clickedUpMovie.backdrop_path,
+                            clickedPopularTv.backdrop_path,
                             "w500"
                           )})`,
                         }}
                       />
-                      <BigTitle>{clickedUpMovie.title}</BigTitle>
-                      <BigOverview>{clickedUpMovie.overview}</BigOverview>
-                      <BigOverview>
-                        Release Data :{clickedUpMovie.release_date}
-                      </BigOverview>
+                      <BigTitle>{clickedPopularTv.name}</BigTitle>
+
+                      <BigOverview>{clickedPopularTv.overview}</BigOverview>
                     </BigMovie>
                   ) : null)}
               </>
