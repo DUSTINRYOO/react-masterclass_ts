@@ -1,6 +1,12 @@
 const API_KEY = process.env.REACT_APP_APIKEY;
 const BASE_PATH = "https://api.themoviedb.org/3";
-
+interface ITv {
+  id: number;
+  backdrop_path: string;
+  poster_path: string;
+  name: string;
+  overview: string;
+}
 interface IMovie {
   id: number;
   backdrop_path: string;
@@ -13,6 +19,21 @@ interface ILatest {
   id: number;
   name: string;
 }
+
+export interface IGetLatestTvResult {
+  genres: ILatest[];
+  backdrop_path: string;
+  id: number;
+  name: string;
+  overview: string;
+}
+export interface IGetTvsResult {
+  page: number;
+  results: ITv[];
+  total_pages: number;
+  total_results: number;
+}
+
 export interface IGetMoviesResult {
   dates: {
     maximum: string;
@@ -39,6 +60,26 @@ export interface IGetTopRatedResult {
   results: IMovie[];
   total_pages: number;
   total_results: number;
+}
+export function getTvAiring() {
+  return fetch(`${BASE_PATH}/tv/airing_today?api_key=${API_KEY}`).then(
+    (response) => response.json()
+  );
+}
+export function getTvLatest() {
+  return fetch(`${BASE_PATH}/tv/latest?api_key=${API_KEY}`).then((response) =>
+    response.json()
+  );
+}
+export function getTvPopular() {
+  return fetch(`${BASE_PATH}/tv/popular?api_key=${API_KEY}`).then((response) =>
+    response.json()
+  );
+}
+export function getTvTopRated() {
+  return fetch(`${BASE_PATH}/tv/top_rated?api_key=${API_KEY}`).then(
+    (response) => response.json()
+  );
 }
 
 export function getMovies() {
