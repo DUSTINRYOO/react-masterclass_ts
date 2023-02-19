@@ -111,3 +111,9 @@ export function getSearchTv(keyword: string) {
     `${BASE_PATH}/search/tv?api_key=${API_KEY}&query=${keyword}`
   ).then((response) => response.json());
 }
+
+export function getSearchMovie(keyword: string) {
+  return fetch(
+    `${BASE_PATH}/search/movie?api_key=${API_KEY}&query=${keyword}`
+  ).then((response) => response.json());
+}
