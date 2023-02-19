@@ -32,6 +32,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -57,7 +59,9 @@
   },
   "devDependencies": {
     "dotenv": "^16.0.3",
+    "gh-pages": "^5.0.0",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1"
-  }
+  },
+  "homepage": "https://dustinryoo.github.io/react-masterclass_ts"
 }
